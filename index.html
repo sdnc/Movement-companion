@@ -182,7 +182,7 @@ const PHASE_COLORS = { Isolation:'var(--slate)', Integration:'var(--ochre)', Imp
 const PHASE_BG = { Isolation:'rgba(124,132,148,0.16)', Integration:'rgba(195,144,63,0.16)', Improvisation:'rgba(196,106,85,0.16)', 'Cool-down':'rgba(124,143,102,0.16)' };
 
 const DAYS = [
-{ title:"Push & Ground Force", loc:"Gym", ex:[
+{ title:"Push & Ground Force", tab:"Push", loc:"Gym", ex:[
   {phase:"Isolation", name:"Wrist & shoulder CARs", cue:"Slow circles, no rushing.", sec:240, icon:"stretch"},
   {phase:"Isolation", name:"Deep-squat hip warm-up", cue:"Sit low, rock, reach overhead.", sec:240, icon:"squat"},
   {phase:"Isolation", name:"Dead hang #1", cue:"Passive into active — let the spine decompress.", sec:180, icon:"hang"},
@@ -198,7 +198,7 @@ const DAYS = [
   {phase:"Cool-down", name:"Child's pose → cobra", cue:"Slow spinal wave.", sec:240, icon:"stretch"},
   {phase:"Cool-down", name:"Closing breath", cue:"Release through the front line.", sec:120, icon:"breath"}
 ]},
-{ title:"Pull & Hang", loc:"Gym", ex:[
+{ title:"Pull & Hang", tab:"Pull", loc:"Gym", ex:[
   {phase:"Isolation", name:"Shoulder CARs + scapular drills", cue:"Retraction/protraction — isolate the shoulder blade.", sec:240, icon:"stretch"},
   {phase:"Isolation", name:"Deep-squat hip warm-up", cue:"Sit low, rock, reach overhead.", sec:240, icon:"squat"},
   {phase:"Isolation", name:"Dead hang #1", cue:"Passive into scapular engagement.", sec:180, icon:"hang"},
@@ -214,7 +214,7 @@ const DAYS = [
   {phase:"Cool-down", name:"Forearm & wrist release", cue:"After grip-heavy work.", sec:180, icon:"stretch"},
   {phase:"Cool-down", name:"Breath into the back body", cue:"The side you rarely feel.", sec:120, icon:"breath"}
 ]},
-{ title:"Ground Flow & Integration", loc:"Outside — no equipment", ex:[
+{ title:"Ground Flow & Integration", tab:"Ground Flow", loc:"Outside — no equipment", ex:[
   {phase:"Isolation", name:"Grounding & breath", cue:"Seated stillness, slow body scan.", sec:300, icon:"breath"},
   {phase:"Isolation", name:"Deep-squat hip warm-up", cue:"Extended — let the hips actually open.", sec:240, icon:"squat"},
   {phase:"Isolation", name:"Dead hang #1", cue:"Branch or park bar — short hang if nothing's around.", sec:180, icon:"hang"},
@@ -227,7 +227,7 @@ const DAYS = [
   {phase:"Cool-down", name:"Jaw–occiput release", cue:"Supine, paired with slow pelvic-floor breath.", sec:180, icon:"breath"},
   {phase:"Cool-down", name:"Closing stillness", cue:"Spinal waves, then quiet intention.", sec:180, icon:"breath"}
 ]},
-{ title:"Legs, Ground & Inversion", loc:"Gym", ex:[
+{ title:"Legs, Ground & Inversion", tab:"Legs", loc:"Gym", ex:[
   {phase:"Isolation", name:"Ankle & hip CARs", cue:"Isolated joint circles.", sec:240, icon:"stretch"},
   {phase:"Isolation", name:"Deep-squat hip warm-up", cue:"Extend the hold and rocking here.", sec:240, icon:"squat"},
   {phase:"Isolation", name:"Dead hang #1", cue:"Decompress before loading the legs.", sec:180, icon:"hang"},
@@ -242,7 +242,7 @@ const DAYS = [
   {phase:"Cool-down", name:"Hamstring floor stretch", cue:"Slow, breath-led.", sec:180, icon:"stretch"},
   {phase:"Cool-down", name:"Calf, soleus & forward fold", cue:"Close seated.", sec:180, icon:"stretch"}
 ]},
-{ title:"Pulse — Locomotion & Cardio", loc:"Anywhere", ex:[
+{ title:"Pulse — Locomotion & Cardio", tab:"Pulse", loc:"Anywhere", ex:[
   {phase:"Isolation", name:"Dynamic warm-up locomotion", cue:"Walk/jog — skips, shuffles, backward jog.", sec:300, icon:"cardio"},
   {phase:"Isolation", name:"Deep-squat hip warm-up", cue:"Sit low, rock, reach overhead.", sec:240, icon:"squat"},
   {phase:"Isolation", name:"Dead hang #1", cue:"If a bar or sturdy branch is nearby.", sec:180, icon:"hang"},
@@ -289,7 +289,7 @@ function beep(){
 
 function renderTabs(){
   el('dayTabs').innerHTML = DAYS.map((d,i) =>
-    `<div class="day-tab ${i===dayIdx?'active':''}" data-i="${i}">Day ${i+1}</div>`
+    `<div class="day-tab ${i===dayIdx?'active':''}" data-i="${i}">${d.tab}</div>`
   ).join('');
   el('dayTabs').querySelectorAll('.day-tab').forEach(tab=>{
     tab.onclick = () => { dayIdx = +tab.dataset.i; exIdx = 0; loadExercise(); };
