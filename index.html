@@ -30,7 +30,11 @@
   h1,.disp{ font-family:'Fraunces',serif; font-weight:500; }
 
   /* Day tabs */
-  .day-tabs{ display:flex; gap:6px; overflow-x:auto; padding-bottom:4px; margin-bottom:18px; }
+  .day-tabs{
+    display:flex; gap:6px; overflow-x:auto; padding:10px 0 10px; margin-bottom:14px;
+    position:sticky; top:0; z-index:20; background:var(--bg);
+    padding-top:calc(10px + env(safe-area-inset-top, 0px));
+  }
   .day-tab{
     flex:0 0 auto; background:var(--bg-2); border:1px solid var(--hairline); color:var(--ink-faint);
     font-family:'Sora',sans-serif; font-size:12.5px; font-weight:600; padding:9px 13px; border-radius:99px;
@@ -61,7 +65,7 @@
 
   /* Portrait "reel" video/photo thumbnail — consistent size for every card */
   .icon-wrap.has-media{
-    width:158px; height:280px; border-radius:18px; cursor:pointer; position:relative; overflow:hidden;
+    width:124px; height:220px; border-radius:16px; cursor:pointer; position:relative; overflow:hidden;
   }
   .icon-wrap.has-media video, .icon-wrap.has-media img{
     width:100%; height:100%; object-fit:cover; display:block;
@@ -90,6 +94,12 @@
 
   .ex-name{ font-size:24px; color:var(--ink); margin:0 0 10px; line-height:1.2; }
   .ex-cue{ font-size:14.5px; color:var(--ink-dim); max-width:320px; margin:0 0 22px; font-style:italic; }
+
+  .sides-tag{
+    display:none; font-size:12px; color:var(--violet); background:rgba(138,107,201,0.12);
+    border:1px solid var(--violet-dim); padding:5px 12px; border-radius:99px; margin:-10px 0 22px;
+  }
+  .sides-tag.show{ display:inline-block; }
 
   .timer{
     font-family:'Fraunces',serif; font-size:56px; font-weight:400; color:var(--ink);
@@ -161,6 +171,7 @@
     <div class="icon-wrap" id="iconWrap"></div>
     <div class="ex-name" id="exName"></div>
     <div class="ex-cue" id="exCue"></div>
+    <div class="sides-tag" id="sidesTag">↔ switch sides at halfway</div>
 
     <div class="timer" id="timerDisplay">00:00</div>
     <div class="timer-label" id="timerLabel">remaining</div>
@@ -214,7 +225,7 @@ const PHASE_BG = { Isolation:'rgba(124,132,148,0.16)', Integration:'rgba(195,144
 
 const DAYS = [
 { title:"Push & Ground Force", tab:"Push", loc:"Gym", ex:[
-  {phase:"Isolation", name:"Wrist & shoulder CARs", cue:"Slow circles, no rushing.", sec:240, media:"media/shouldercars.mp4"},
+  {phase:"Isolation", name:"Wrist & shoulder CARs", cue:"Slow circles, no rushing.", sec:240},
   {phase:"Isolation", name:"Deep-squat hip warm-up", cue:"Sit low, rock, reach overhead.", sec:240},
   {phase:"Isolation", name:"Dead hang #1", cue:"Passive into active — let the spine decompress.", sec:180},
   {phase:"Isolation", name:"Ground force primer", cue:"Bear crawl / crab walk / ape reach — feel where the push originates.", sec:360},
@@ -288,12 +299,24 @@ const DAYS = [
 ];
 
 /* ---------- STATE ---------- */
-let dayIdx = 0, exIdx = 0, secondsLeft = 0, running = false, timerId = null;
+let dayIdx = 0, exIdx = 0, secondsLeft = 0, running = false, timerId = null, sideSwitchPlayed = false;
 
 const el = id => document.getElementById(id);
 const fmt = s => `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
 
+/* ---------- END-OF-TIMER SOUND ---------- */
+/* Set this to your own sound file's path, e.g. "media/timer-end.mp3" — or leave as null to use the built-in beep. */
+const END_SOUND = null;
+
 function beep(){
+  if (END_SOUND){
+    try{
+      const audio = new Audio(END_SOUND);
+      audio.volume = 0.8;
+      audio.play().catch(()=>{});
+      return;
+    }catch(e){}
+  }
   try{
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
     const o = ctx.createOscillator(), g = ctx.createGain();
@@ -302,6 +325,32 @@ function beep(){
     g.gain.setValueAtTime(0.15, ctx.currentTime);
     g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
     o.start(); o.stop(ctx.currentTime + 0.4);
+  }catch(e){}
+}
+
+/* ---------- HALFWAY "CHANGE SIDES" SOUND ---------- */
+/* Set this to your own sound file's path — or leave as null to use the built-in double-pulse tone. */
+const SIDE_SWITCH_SOUND = null;
+
+function sideSwitchSound(){
+  if (SIDE_SWITCH_SOUND){
+    try{
+      const audio = new Audio(SIDE_SWITCH_SOUND);
+      audio.volume = 0.8;
+      audio.play().catch(()=>{});
+      return;
+    }catch(e){}
+  }
+  try{
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    [0, 0.18].forEach(delay => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = 'sine'; o.frequency.value = 440;
+      o.connect(g); g.connect(ctx.destination);
+      g.gain.setValueAtTime(0.15, ctx.currentTime + delay);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + 0.15);
+      o.start(ctx.currentTime + delay); o.stop(ctx.currentTime + delay + 0.15);
+    });
   }catch(e){}
 }
 
@@ -352,6 +401,8 @@ function loadExercise(){
   }
   el('exName').textContent = ex.name;
   el('exCue').textContent = ex.cue;
+  el('sidesTag').classList.toggle('show', !!ex.sides);
+  sideSwitchPlayed = false;
 
   secondsLeft = ex.sec;
   el('timerDisplay').textContent = fmt(secondsLeft);
@@ -368,6 +419,12 @@ function tick(){
   if (secondsLeft > 0){
     secondsLeft--;
     el('timerDisplay').textContent = fmt(secondsLeft);
+
+    const ex = DAYS[dayIdx].ex[exIdx];
+    if (ex.sides && !sideSwitchPlayed && secondsLeft <= Math.floor(ex.sec / 2)){
+      sideSwitchPlayed = true;
+      sideSwitchSound();
+    }
   }
   if (secondsLeft === 0){
     stopTimer();
@@ -427,6 +484,7 @@ function setDuration(newSec){
   const ex = DAYS[dayIdx].ex[exIdx];
   ex.sec = newSec;         // updates the exercise's default duration (so Reset uses it too)
   secondsLeft = newSec;    // updates what's showing right now
+  sideSwitchPlayed = false; // re-arm the halfway sound against the new duration
   el('timerDisplay').textContent = fmt(secondsLeft);
 }
 
@@ -451,7 +509,7 @@ el('saveTimeBtn').onclick = () => {
 };
 
 el('playBtn').onclick = () => running ? stopTimer() : startTimer();
-el('resetBtn').onclick = () => { stopTimer(); secondsLeft = DAYS[dayIdx].ex[exIdx].sec; el('timerDisplay').textContent = fmt(secondsLeft); };
+el('resetBtn').onclick = () => { stopTimer(); secondsLeft = DAYS[dayIdx].ex[exIdx].sec; sideSwitchPlayed = false; el('timerDisplay').textContent = fmt(secondsLeft); };
 el('skipBtn').onclick = () => { stopTimer(); secondsLeft = 0; el('timerDisplay').textContent = fmt(0); };
 el('nextBtn').onclick = () => goNext(false);
 el('prevBtn').onclick = () => goPrev();
