@@ -224,21 +224,25 @@ const PHASE_COLORS = { Isolation:'var(--slate)', Integration:'var(--ochre)', Imp
 const PHASE_BG = { Isolation:'rgba(124,132,148,0.16)', Integration:'rgba(195,144,63,0.16)', Improvisation:'rgba(196,106,85,0.16)', 'Cool-down':'rgba(124,143,102,0.16)' };
 
 const DAYS = [
-{ title:"Push & Ground Force", tab:"Push", loc:"Gym", ex:[
-  {phase:"Isolation", name:"Wrist & shoulder CARs", cue:"Slow circles, no rushing.", sec:240},
-  {phase:"Isolation", name:"Deep-squat hip warm-up", cue:"Sit low, rock, reach overhead.", sec:240},
-  {phase:"Isolation", name:"Dead hang #1", cue:"Passive into active — let the spine decompress.", sec:180},
-  {phase:"Isolation", name:"Ground force primer", cue:"Bear crawl / crab walk / ape reach — feel where the push originates.", sec:360},
-  {phase:"Isolation", name:"Handstand isolation", cue:"Wall walks, wrist-loaded holds.", sec:180},
-  {phase:"Integration", name:"Push-up progressions", cue:"Incline/decline + pike push-ups — 3–5 sec on the way down.", sec:540},
-  {phase:"Integration", name:"Crawl-to-press complex", cue:"Bear crawl → push-up → ape reach, one flowing pattern.", sec:420},
-  {phase:"Integration", name:"Dead hang #2", cue:"Reset grip and shoulders.", sec:120},
-  {phase:"Integration", name:"Loaded / banded press", cue:"If equipment allows.", sec:240},
-  {phase:"Improvisation", name:"Free-flow: crawl / reach / press", cue:"No script — let the body suggest the next shape.", sec:360},
-  {phase:"Improvisation", name:"Dead hang #3", cue:"Closing hang.", sec:120},
-  {phase:"Cool-down", name:"Chest & shoulder opener", cue:"Slow breath, don't force the range.", sec:240},
-  {phase:"Cool-down", name:"Child's pose → cobra", cue:"Slow spinal wave.", sec:240},
-  {phase:"Cool-down", name:"Closing breath", cue:"Release through the front line.", sec:120}
+{ title:"Morning Flow", tab:"AM", loc:"Home", ex:[
+  {name:"Feet on ground, deep breaths", cue:"Slow circles, no rushing.", sec:60., media:"media/mantra.jpg"},
+  {name:"Shoulder CARs", cue:"Slow circles, no rushing.", sec:120, media:"media/shouldercars.mp4"},
+  {name:"Forward fold + elephant walk", cue:"", sec:90, media:"media/elephantwalk.mp4"},
+  {name:"Wrist activation", cue:"Warm up and active wrists", sec:90, media:"media/wrists.jpg"},
+  {name:"Ankle activation", cue:"Ankle warm-up", sec:90, media:"media/ankles.jpg"},
+  {name:"Hip cars", cue:"Slow gentle movement, back stable, you could keep a water bottle there", sec:60, media:"media/hipcars.mp4"},
+  {name:"Downward Dog -> Plank -> Cobra Flow", cue:"Warm up the body", sec:120, media:"media/flow.jpg"},
+  {name:"Plank", cue:"Activate abs", sec:60},
+  {name:"Push-ups", cue:"Vary wide and narrow stance, you may go incline/decline or use wall", sec:60},
+  {name:"Squat-to-stand with reach", cue:"Deep breaths here, go slow", sec:90, media:"media/deepsquat.jpg"},
+  {name:"Duck walk", cue:"Lower your hips into a deep, controlled squat and take small, steady steps and chest up", sec:90, media:"media/duckwalk.mp4"},
+  {name:"Crab walk", cue:"Hands under shoulders, squeeze your shoulder blades down", sec:90, media:"media/crabwalk.mp4"},
+  {name:"Dead bugs", cue:"Engaged core", sec:60, media:"media/deadbugs.jpg"},
+  {name:"Boat pose", cue:"", sec:60, media:"media/boatpose.jpg"},
+  {name:"Child's pose", cue:"", sec:60, media:"media/childspose.jpg"},
+  {name:"Lymphatic drainage", cue:"Circular motions to activate lymph system", sec:120, media:"media/lymphdrain.jpg"},
+  {name:"Vertical shake", cue:"Let the floor and gravity support you", sec:90, media:"media/vericalshake.mp4"},
+  {name:"Face massage", cue:"Presence", sec:300, media:"media/facemassage.jpg"},
 ]},
 { title:"Pull & Hang", tab:"Pull", loc:"Gym", ex:[
   {phase:"Isolation", name:"Shoulder CARs + scapular drills", cue:"Retraction/protraction — isolate the shoulder blade.", sec:240},
